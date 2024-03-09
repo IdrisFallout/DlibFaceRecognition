@@ -1,4 +1,4 @@
-FROM laviua/dlib-base:arm64
+FROM idrisfallout/python-dlib:1.0
 RUN mkdir -p /home/app/src
 WORKDIR /home/app/src
 COPY ./ /home/app/src
