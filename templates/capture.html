@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camera Screenshot</title>
+</head>
+<body>
+    <h1>Camera Screenshot</h1>
+    <video id="video" autoplay></video>
+    <button id="screenshotBtn">Take Screenshot</button>
+    <p id="screenshotCounter">Screenshots Taken: 0</p>
+    <button id="resetBtn">Add Face</button>
+
+    <script>
+        const video = document.getElementById('video');
+        const screenshotBtn = document.getElementById('screenshotBtn');
+        const screenshotCounter = document.getElementById('screenshotCounter');
+        const resetBtn = document.getElementById('resetBtn');
+        let screenshots = [];
+        let admissionNumber = null;
+
+        // Function to initialize the camera
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing the camera: ', err);
+            }
+        }
+
+        // Function to take a screenshot
+        function takeScreenshot() {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas to a data URL
+            const dataURL = canvas.toDataURL('image/jpeg'); // Changed to 'image/jpeg' to match the server-side expectation
+
+            // Add the screenshot to the array
+            screenshots.push(dataURL);
+
+            // Update the screenshot counter
+            screenshotCounter.textContent = `Screenshots Taken: ${screenshots.length}`;
+
+            // Check if 20 screenshots have been taken
+            if (screenshots.length === 20) {
+                // Prompt for admission number
+                admissionNumber = prompt('Please enter your admission number:');
+                if (admissionNumber !== null) {
+                    sendScreenshots();
+                }
+            }
+        }
+
+        // Function to send the screenshots and admission number
+        function sendScreenshots() {
+            // Create a FormData object
+            const formData = new FormData();
+            // Add admission number as text
+            formData.append('admission', admissionNumber);
+
+            // Convert base64 screenshots to Blob objects and append them as files
+            screenshots.forEach((screenshot, index) => {
+                // Convert base64 data to a Blob
+                const byteCharacters = atob(screenshot.split(',')[1]);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' }); // Changed to 'image/jpeg' to match the server-side expectation
+
+                // Append the Blob as a file
+                formData.append(`images`, blob, `screenshot_${index + 1}.jpg`); // Changed key to 'images' to match the server-side expectation
+            });
+
+            // Send the FormData to the server
+            fetch('/save_images', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    console.log('Screenshots sent successfully!');
+                    // Clear screenshots array
+                    screenshots = [];
+                    // Reset the screenshot counter
+                    screenshotCounter.textContent = `Screenshots Taken: 0`;
+                } else {
+                    console.error('Failed to send screenshots.');
+                }
+            }).catch(error => {
+                console.error('Error sending screenshots:', error);
+            });
+        }
+
+        // Function to reset the screenshot counter and clear screenshots array
+        function resetCounter() {
+            screenshots = [];
+            screenshotCounter.textContent = `Screenshots Taken: 0`;
+        }
+
+        // Event listener for the screenshot button
+        screenshotBtn.addEventListener('click', takeScreenshot);
+
+        // Event listener for the reset button
+        resetBtn.addEventListener('click', resetCounter);
+
+        // Initialize the camera when the page loads
+        window.addEventListener('load', initCamera);
+    </script>
+</body>
+</html>
