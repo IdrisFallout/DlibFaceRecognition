@@ -5,7 +5,7 @@ name: Deploy to Home Server
 on:
   push:
     branches:
-      - master
+      - main
 
 # Define global variables
 env:
