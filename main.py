@@ -1,3 +1,5 @@
+from flask import Flask, render_template, request, jsonify, Response
+import os
 import cv2
 import time
 import pickle
@@ -5,9 +7,11 @@ import face_recognition
 import numpy as np
 from face_recognition.face_recognition_cli import image_files_in_folder
 from Streamer import streamer  # Assuming you have a Streamer module
-from flask import Flask, Response
 
 app = Flask(__name__)
+
+# Directory to save captured images
+TRAINING_IMAGES_DIR = 'train_img'
 
 # Set the desired frames per second
 fps = 24
@@ -16,6 +20,33 @@ frame_delay = 1 / fps
 # Set the desired window size
 window_width = 800
 window_height = 600
+
+
+# Route to capture images
+@app.route('/')
+def capture_images():
+    return render_template('capture.html')
+
+
+# Route to save captured images
+@app.route('/save_images', methods=['POST'])
+def save_images():
+    label = request.form.get('admission')
+    if not label:
+        return jsonify({'message': 'Label not provided.'}), 400
+
+    images = request.files.getlist('images')
+    if len(images) != 20:
+        return jsonify({'message': 'Exactly 20 images are required.'}), 400
+
+    label_dir = os.path.join(TRAINING_IMAGES_DIR, label)
+    if not os.path.exists(label_dir):
+        os.makedirs(label_dir)
+
+    for i, image in enumerate(images):
+        image.save(os.path.join(label_dir, f'image_{i + 1}.jpg'))
+
+    return jsonify({'message': 'Images saved successfully.'})
 
 
 def predict(img_path, knn_clf=None, model_path=None, threshold=0.1):
@@ -71,5 +102,5 @@ def feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True, threaded=True, port=5000)
+if __name__ == '__main__':
+    app.run(debug=True)

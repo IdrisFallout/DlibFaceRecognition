@@ -1,6 +1,6 @@
 import urllib.request
 
-url = "http://192.168.1.101:8080/shot.jpg"
+url = "http://102.166.27.192:8080/shot.jpg"
 
 
 def get_feed():

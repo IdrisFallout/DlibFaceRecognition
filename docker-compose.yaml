@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  facerecognition:
+    image: idrisfallout/facerecognition:1.0
+    container_name: facerecognition
+    restart: unless-stopped
+    environment:
+      - TZ=Africa/Nairobi
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.facerecognition.entrypoints=http"
+      - "traefik.http.routers.facerecognition.rule=Host(`access.waithakasam.com`)"
+      - "traefik.http.middlewares.facerecognition-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.facerecognition.middlewares=facerecognition-https-redirect"
+      - "traefik.http.routers.facerecognition-secure.entrypoints=https"
+      - "traefik.http.routers.facerecognition-secure.rule=Host(`access.waithakasam.com`)"
+      - "traefik.http.routers.facerecognition-secure.tls=true"
+      - "traefik.http.routers.facerecognition-secure.service=facerecognition"
+      - "traefik.http.services.facerecognition.loadbalancer.server.port=5000"
+    networks:
+      - nginxproxymanager_network
+
+networks:
+  nginxproxymanager_network:
+    external: true
