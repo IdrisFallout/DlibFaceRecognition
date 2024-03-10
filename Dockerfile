@@ -1,4 +1,4 @@
-FROM idrisfallout/python-numpy:1.0
+FROM python:3.8.0-alpine3.10
 RUN mkdir -p /home/app/src
 WORKDIR /home/app/src
 COPY ./ /home/app/src
