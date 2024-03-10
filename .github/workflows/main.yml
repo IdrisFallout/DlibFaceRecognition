@@ -40,11 +40,6 @@ jobs:
         run: |
           # Assuming your docker-compose.yml is in the same directory
           docker-compose up -d
-        env:
-          RABBITMQ_USER: ${{ secrets.RABBITMQ_USER }}
-          RABBITMQ_PASSWORD: ${{ secrets.RABBITMQ_PASSWORD }}
-          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
 
       - name: Remove dangling Docker images
         run: |
