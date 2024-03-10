@@ -1,26 +1,4 @@
-FROM python:3.9.2-alpine3.13
-
-# Install face-recognition dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    git \
-    wget \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install face-recognition dependencies
-RUN apt-get update && apt-get install -y \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install face-recognition
-RUN pip install face-recognition
-
-# Install scikit-learn and opencv-contrib-python
-RUN pip install scikit-learn opencv-contrib-python
-
+FROM python:3.10.12-alpine3.18
 RUN mkdir -p /home/app/src
 WORKDIR /home/app/src
 COPY ./ /home/app/src
