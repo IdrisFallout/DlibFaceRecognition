@@ -1,4 +1,4 @@
-FROM python:3.10.12-alpine3.18
+FROM python:3.8.0-alpine3.10
 RUN mkdir -p /home/app/src
 WORKDIR /home/app/src
 COPY ./ /home/app/src
