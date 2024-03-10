@@ -4,6 +4,9 @@ services:
   facerecognition:
     image: idrisfallout/facerecognition:1.0
     container_name: facerecognition
+    volumes:
+      - /home/idrisfallout/Docker-Services/github-selfhosted/FaceRecognition/facerecognition/classifier:/home/app/src/classifier
+      - /home/idrisfallout/Docker-Services/github-selfhosted/FaceRecognition/facerecognition/train_img:/home/app/src/train_img
     restart: unless-stopped
     environment:
       - TZ=Africa/Nairobi
