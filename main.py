@@ -49,7 +49,7 @@ def save_images():
     return jsonify({'message': 'Images saved successfully.'})
 
 
-def predict(img_path, knn_clf=None, model_path=None, threshold=0.1):
+def predict(img_path, knn_clf=None, model_path=None, threshold=0.6):
     if knn_clf is None and model_path is None:
         raise Exception("Must supply knn classifier either through knn_clf or model_path")
     if knn_clf is None:
